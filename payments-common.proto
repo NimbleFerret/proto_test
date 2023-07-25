@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package PaymentsCommon;
+
+enum PaymentSystemsEnum {
+  TEST = 0;
+  AZARPAY = 1;
+  CONSTANTPOS = 2;
+  COREFY = 3;
+  EPUL = 4;
+  HAVALEHERA = 5;
+  PAYCOS = 6;
+  PAYFIX = 7;
+  SIMPLEPAY = 8;
+  PAYCASSMA = 9;
+  CUPIS = 10;
+  MANUAL = 11;
+  BONUS = 12;
+  PAYHERA = 13;
+  BITOLO = 14;
+  PAYZOFT = 15;
+  GATEEXPRESS = 16;
+  PAYZEN = 17;
+  VIRAPAY = 18;
+  OCP = 19;
+  PAGSMILE = 20;
+}
+
+enum PaymentSystemsMethodsEnum {
+  TEST_METHOD = 0;
+  ANINDA_HAVALE = 1;
+  BANK_CREDIT_CARDS = 2;
+  EXPRESS = 3;
+  HAVALE_VIP = 4;
+  MEFETE = 5;
+  PAPARA = 6;
+  BKASH = 7;
+  BKASH_P2C = 8;
+  NAGAD = 9;
+  ROCKET = 10;
+  NAGAD_P2C = 11;
+  MPESA = 12;
+  WAVEPAY = 13;
+  KBZPAY_MANUAL = 14;
+  EASYPAISA = 15;
+  UPI_S = 16;
+  IMPS = 17;
+  Bank_Cards = 18;
+}
+
+enum PaymentSystemStatusEnum {
+  ACTIVE = 0;
+  INACTIVE = 1;
+}
+
+message PaymentSystemInterface {
+    int32 id = 1;
+    PaymentSystemsEnum name = 2;
+    PaymentSystemStatusEnum status = 3;
+    string currencyIsoCode = 4;
+    PaymentSystemsMethodsEnum method = 5;
+}

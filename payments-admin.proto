@@ -1,0 +1,225 @@
+syntax = "proto3";
+
+package PaymentsAdmin;
+
+import "payments-service.proto";
+
+enum SortMethodEnum {
+    ASC = 0;
+    DESC = 1;
+}
+
+enum AdminTransactionsSortByEnum {
+    ID = 0;
+    USER_ID = 1;
+    EMAIL = 2;
+    CREATED_AT = 3;
+    ACTIVATED_DATE = 4;
+    STATUS = 5;
+    CURRENCY = 6;
+    PAYMENT_SYSTEM = 7;
+    AMOUNT = 8;
+    TYPE = 9;
+}
+
+service PaymentsAdmin {
+  rpc GetAdminTransactions (GetAdminTransactionsRequest) returns (GetAdminTransactionsResponse);
+  rpc UpdateTransactionStatus (UpdateTransactionStatusRequest) returns (UpdateTransactionStatusResponse);
+  rpc UpdateTransactionRecalculation (UpdateTransactionRecalculationRequest) returns (UpdateTransactionRecalculationResponse);
+  rpc ApproveWithdrawal (ApproveWithdrawalRequest) returns (ApproveWithdrawalResponse);
+  rpc DeclineWithdrawal (DeclineWithdrawalRequest) returns (DeclineWithdrawalResponse);
+  rpc DeclineWithdrawalByUsers (DeclineWithdrawalByUsersRequest) returns (DeclineWithdrawalByUsersResponse);
+  rpc GetSecureTransactions (GetSecureTransactionsRequest) returns (GetSecureTransactionsResponse);
+  rpc GetAdminWithdrawal (GetAdminWithdrawalRequest) returns (GetAdminWithdrawalResponse);
+  rpc GetThreeSuccessDepositDates (GetThreeSuccessDepositDatesRequest) returns (GetThreeSuccessDepositDatesResponse);
+}
+
+// -------------------------------------
+// Get admin transactions
+// -------------------------------------
+
+message AdminTransaction {
+    int32 transactionid = 1;
+    string activationdate = 2;
+    string activationTime = 3;
+    string remotetransactionid = 4;
+    string email = 5;
+    int32 customerid = 6;
+    string paymentsystem = 7;
+    string amount = 8;
+    string currency = 9;
+    string status = 10;
+    string type = 11;
+    string depositamount = 12;
+    string withdrawamount = 13;
+    int32 prevsuccesscount = 14;
+}
+
+message AdminTransactionsRawFilters {
+    PaymentsService.TransactionTypesEnum typeOperation = 1;
+    repeated int32 ids = 2;
+    repeated int32 customerIds = 3;
+    string email = 4;
+    string dateFrom = 5;
+    string dateTo = 6;
+    repeated string statuses = 7;
+    repeated string currencies = 8;
+    repeated string paymentSystems = 9;
+    string amountTo = 10;
+    string amountFrom = 11;
+    bool requiredAdminValidation = 12;
+}
+
+message AdminTransactionErrorResponse {
+    string message = 1;
+    string error = 2;
+}
+
+message GetAdminTransactionsRequest {
+    AdminTransactionsRawFilters filters = 1;
+    SortMethodEnum sortMethod = 2;
+    AdminTransactionsSortByEnum sortBy = 3;
+    int32 page = 4;
+    int32 limit = 5;
+}
+
+message GetAdminTransactionsResponse {
+    repeated AdminTransaction data = 1;
+    AdminTransactionErrorResponse errorData = 2;
+    int32 statusCode = 3;
+}
+
+// -------------------------------------
+// Update transaction status
+// -------------------------------------
+
+// TODO DELETE ?
+message SuccessResponse {
+    bool success = 1;
+}
+
+message WrappedSuccessResponse {
+    SuccessResponse data = 1;
+    int32 statusCode = 2;
+}
+
+message UpdateTransactionStatusRequest {
+    string transactionId = 1;
+    PaymentsService.TransactionStatusEnum status = 2;
+    PaymentsService.TransactionTypesEnum type = 3;
+    int32 userId = 4;
+}
+
+message UpdateTransactionStatusResponse {
+    GetAdminTransactionsResponse transactionsResponse = 1;
+    WrappedSuccessResponse statusResponse = 2;
+}
+
+// -------------------------------------
+// Update transaction recalculation
+// -------------------------------------
+
+message UpdateTransactionRecalculationRequest {
+}
+
+message UpdateTransactionRecalculationResponse {
+    GetAdminTransactionsResponse transactionsResponse = 1;
+    WrappedSuccessResponse statusResponse = 2;
+}
+
+// -------------------------------------
+// Approve withdrawal
+// -------------------------------------
+
+message WithdrawalError {
+    string msg = 2;
+    int32 transactionId = 3;
+}
+
+message ApproveWithdrawalRequest {
+    repeated int32 transactionIds = 1;
+}
+
+message ApproveWithdrawalResponse {
+    int32 statusCode = 1;
+    repeated int32 transactionIds = 2;
+    WithdrawalError error = 3;
+}
+
+// -------------------------------------
+// Decline withdrawal
+// -------------------------------------
+
+message DeclineWithdrawalRequest {
+    repeated int32 transactionIds = 1;
+}
+
+message DeclineWithdrawalResponse {
+    int32 statusCode = 1;
+    repeated int32 transactionIds = 2;
+    WithdrawalError error = 3;
+}
+
+// -------------------------------------
+// Decline withdrawal by users
+// -------------------------------------
+
+message DeclineWithdrawalByUsersRequest {
+    repeated int32 userIds = 1;
+}
+
+message DeclineWithdrawalByUsersResponse {
+    bool success = 1;
+}
+
+// -------------------------------------
+// Get secure transactions
+// -------------------------------------
+
+message SecureTransactionsFilters {
+    int32 userId = 1;
+    string currency = 2;
+    string type = 3;
+    string dateFrom = 4;
+    string dateTo = 5;
+    string amountFrom = 6;
+    string amountTo = 7;
+}
+
+message GetSecureTransactionsRequest {
+    SecureTransactionsFilters filters = 1;
+}
+
+message GetSecureTransactionsResponse {
+    int32 statusCode = 1;
+    repeated PaymentsService.Transaction transactions = 2;
+}
+
+// -------------------------------------
+// Get admin withdrawal
+// -------------------------------------
+
+message GetAdminWithdrawalRequest {
+    AdminTransactionsRawFilters filters = 1;
+    SortMethodEnum sortBy = 2;
+    int32 page = 3;
+    int32 limit = 4;
+}
+
+message GetAdminWithdrawalResponse {
+    GetAdminTransactionsResponse data = 1;
+}
+
+// -------------------------------------
+// Get three success deposit dates
+// -------------------------------------
+
+message GetThreeSuccessDepositDatesRequest {
+    int32 userId = 1;
+}
+
+message GetThreeSuccessDepositDatesResponse {
+  string dateFtd = 1;
+  string dateSDep = 2;
+  string dateTDep = 3;
+}

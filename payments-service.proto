@@ -1,0 +1,131 @@
+syntax = "proto3";
+
+package PaymentsService;
+
+import "payments-common.proto";
+import "payments-system-epul.proto";
+
+enum TransactionStatusEnum {
+    SUCCESS = 0;
+    ERROR = 1;
+    PENDING = 2;
+    REJECTED = 3;
+    CANCELED = 4;
+    REQUEST = 5;
+}
+
+enum TransactionTypesEnum {
+    TX_DEPOSIT = 0;
+    TX_WITHDRAW = 1;
+    TX_BONUS = 2;
+}
+
+service PaymentsService {
+  rpc GetPaymentSystems (GetPaymentSystemsRequest) returns (GetPaymentSystemsResponse);
+  rpc GetTransactionsByUserId (GetTransactionsByUserIdRequest) returns (GetTransactionsByUserIdResponse);
+  rpc SaveTransactions (SaveTransactionsRequest) returns (SaveTransactionsResponse);
+  rpc SendGoogleAnalyticSuccessDeposit (SendGoogleAnalyticSuccessDepositRequest) returns (SendGoogleAnalyticSuccessDepositResponse);
+
+  /* 
+    Payment systems
+  */
+
+  rpc DepositEpul (PaymentSystemEpul.DepositEpulRequest) returns (PaymentSystemEpul.DepositEpulResponse);
+  rpc WithdrawalEpul (PaymentSystemEpul.WithdrawalEpulRequest) returns (PaymentSystemEpul.WithdrawalEpulResponse);
+  rpc ApproveEpulWithdrawal (PaymentSystemEpul.ApproveEpulWithdrawalRequest) returns (PaymentSystemEpul.ApproveEpulWithdrawalResponse);
+  rpc EpulCallback (PaymentSystemEpul.EpulCallbackRequest) returns (PaymentSystemEpul.EpulCallbackResponse);
+}
+
+// -------------------------------------
+// Payment systems
+// -------------------------------------
+
+message PaymentSystem {
+    string id = 1;
+    PaymentsCommon.PaymentSystemsEnum name = 2;
+    PaymentsCommon.PaymentSystemStatusEnum status = 3;
+    int32 currencyIsoCode = 4;
+    PaymentsCommon.PaymentSystemsMethodsEnum method = 5;
+}
+
+message GetPaymentSystemsRequest {
+    string currencyCode = 1;
+    string currencyId = 2;
+}
+
+message GetPaymentSystemsResponse {
+    int32 statusCode = 1;
+    repeated PaymentSystem paymentSystem = 2;
+}
+
+// -------------------------------------
+// Get transactions
+// -------------------------------------
+
+message Transaction {
+    string remoteTransactionId = 1;
+    string transactionId = 2;
+    int32 userId = 3;
+    string amount = 4;
+    string currency = 5;
+    int32 createdAt = 6;
+    TransactionStatusEnum status = 7;
+    int32 paymentSystemId = 8;
+    int32 activatedDate = 9;
+    string gaClientId = 10;
+    bool requiredAdminValidation = 11;
+    TransactionTypesEnum type = 12;
+    string email = 13;
+    string bonusId = 14;
+    string errorReason = 15;
+    int32 prevSuccessCount = 16;
+    int32 withdrawAmount = 17;
+    int32 depositAmount = 18;
+}
+
+message GetTransactionsByUserIdRequest {
+    int32 userId = 1;
+    int32 limit = 2;
+    int32 page = 3;
+    repeated TransactionStatusEnum statuses = 4;
+    TransactionTypesEnum type = 5;
+}
+
+message GetTransactionsByUserIdResponse {
+    repeated Transaction data = 1;
+    int32 statusCode = 2;
+    int32 total = 3;
+    int32 lastPage = 4;
+}
+
+// -------------------------------------
+// Save transactions
+// -------------------------------------
+
+message SaveTransactionsRequest {
+    repeated Transaction transactions = 1;
+}
+
+message SaveTransactionsResponse {
+    int32 statusCode = 1;
+    repeated Transaction data = 2;
+}
+
+// -------------------------------------
+// Google analytics
+// -------------------------------------
+
+message SendGoogleAnalyticSuccessDepositRequest {
+    int32 userId = 1;
+    string paymentMethod = 2;
+    string paymentSystem = 3;
+    string paymentAccount = 4;
+    string amount = 5;
+    string currency = 6;
+    string transactionNumber = 7;
+    string clientId = 8;
+}
+
+message SendGoogleAnalyticSuccessDepositResponse {
+    int32 statusCode = 1;
+}
